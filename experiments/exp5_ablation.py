@@ -110,7 +110,7 @@ class _NoLayer1Auditor(DeclassificationAuditor):
     / intent checks) and dispatch directly to Layer 2.
     """
 
-    def audit(self, sink_call, dependency_chain, user_intent):
+    def audit(self, sink_call, dependency_chain, user_intent, manifest=None):
         # Skip Layer 1 entirely — Layer 2 still sees the same audit prompt
         # but no deterministic pre-decision is made.
         if self._llm:
@@ -132,11 +132,14 @@ class _NoLayer1Auditor(DeclassificationAuditor):
                 verdict=str(llm_verdict) if llm_verdict in ("GREEN","YELLOW","RED") else "YELLOW",
                 reason="Layer-2 only (no Layer 1)",
                 token=tok,
+                decided_by="layer2-llm",
+                llm_raw_verdict=str(llm_verdict),
             )
             self._audit_log.append(result)
             return result
         else:
-            return super().audit(sink_call, dependency_chain, user_intent)
+            return super().audit(sink_call, dependency_chain, user_intent,
+                                 manifest=manifest)
 
 
 def _run_no_sanitization(scenarios, auditor):

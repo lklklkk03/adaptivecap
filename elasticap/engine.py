@@ -191,7 +191,8 @@ class ElasticCapEngine:
             budget = Budget.from_sinks(SinkPrivilege(SinkType.DISPLAY))
 
         label = f"{call.tool_name}({resource_key or '?'})"
-        node_id = self.dag.add_source(label, budget, call.tool_name)
+        node_id = self.dag.add_source(label, budget, call.tool_name,
+                                      tool_args=call.arguments)
 
         self.stats.allowed_calls += 1
         return ToolResult(
@@ -215,6 +216,7 @@ class ElasticCapEngine:
                 f"{call.tool_name}(no_deps)",
                 Budget.top(),
                 call.tool_name,
+                tool_args=call.arguments,
             )
             self.stats.allowed_calls += 1
             return ToolResult(
@@ -223,7 +225,8 @@ class ElasticCapEngine:
 
         label = f"{call.tool_name}({json.dumps(call.arguments, default=str)[:50]})"
         node_id = self.dag.add_transform(
-            label, input_ids, call.tool_name, manifest.pass_through
+            label, input_ids, call.tool_name, manifest.pass_through,
+            tool_args=call.arguments,
         )
 
         self.stats.allowed_calls += 1
@@ -288,6 +291,7 @@ class ElasticCapEngine:
                 sink_call=call,
                 dependency_chain=dep_chain,
                 user_intent=self._current_user_intent,
+                manifest=manifest,
             )
 
             if audit_result.verdict == "GREEN":
@@ -371,18 +375,63 @@ class ElasticCapEngine:
         base = manifest.exec_privileges[0]
         args = call.arguments
 
+        # Target argument names, in priority order. The first six are the
+        # generic names used throughout ChainCaps' benchmarks; the rest are
+        # the realistic MCP argument names (Slack channels, GitHub repos,
+        # cloud buckets) whose resolved value becomes the privilege scope.
+        # Resolving them lets a manifest declare a *narrow* scope (e.g.
+        # ``send_http(#announcements)``) that the engine can then match,
+        # instead of always asking for a wildcard scope that no declared
+        # scope can subsume.
+        def _first(*keys):
+            for k in keys:
+                if k in args:
+                    return args[k]
+            return None
+
         if base.operation == SinkType.SEND_HTTP:
-            url = args.get("url", args.get("endpoint", base.scope))
-            return SinkPrivilege(SinkType.SEND_HTTP, str(url))
+            if "slack" in call.tool_name:
+                # Slack tools post to the Slack API. The benchmark manifests
+                # express Slack grants as the API endpoint scope
+                # (``https://slack.com/api/*``), so the requested privilege
+                # must be the endpoint too. A channel name is a resource
+                # *inside* Slack, not an HTTP target a budget can match;
+                # treating it as the scope routes whitelisted Slack flows to
+                # the auditor instead of the budget.
+                return SinkPrivilege(SinkType.SEND_HTTP,
+                                     "https://slack.com/api/*")
+            if "github" in call.tool_name or call.tool_name == "git_push":
+                # Same issue for GitHub tools: manifests grant repository
+                # scopes as ``https://api.github.com/repos/<owner>/<repo>/*``,
+                # so a bare ``owner/repo`` argument must be expanded to the
+                # endpoint form before the budget can match it.
+                repo = _first("repo", "repository")
+                if repo is not None:
+                    return SinkPrivilege(
+                        SinkType.SEND_HTTP,
+                        f"https://api.github.com/repos/{repo}/*")
+                return SinkPrivilege(SinkType.SEND_HTTP, base.scope)
+            url = _first("url", "endpoint", "channel", "channel_name", "repo",
+                         "repository", "workspace", "board", "queue", "topic",
+                         "bucket")
+            return SinkPrivilege(SinkType.SEND_HTTP,
+                                 str(url) if url is not None else base.scope)
         elif base.operation == SinkType.SEND_EMAIL:
-            to = args.get("to", args.get("recipient", "*"))
-            return SinkPrivilege(SinkType.SEND_EMAIL, str(to))
+            to = _first("to", "recipient", "address")
+            return SinkPrivilege(SinkType.SEND_EMAIL,
+                                 str(to) if to is not None else "*")
         elif base.operation == SinkType.WRITE_FILE:
-            path = args.get("path", args.get("file", "*"))
-            return SinkPrivilege(SinkType.WRITE_FILE, str(path))
+            path = _first("path", "file", "filename", "output_path")
+            return SinkPrivilege(SinkType.WRITE_FILE,
+                                 str(path) if path is not None else "*")
         elif base.operation == SinkType.EXECUTE:
-            cmd = args.get("command", args.get("cmd", "*"))
-            return SinkPrivilege(SinkType.EXECUTE, str(cmd))
+            cmd = _first("command", "cmd", "script")
+            return SinkPrivilege(SinkType.EXECUTE,
+                                 str(cmd) if cmd is not None else "*")
+        elif base.operation in (SinkType.DB_WRITE, SinkType.MEMORY_WRITE):
+            table = _first("table", "database", "key", "account", "folder")
+            return SinkPrivilege(base.operation,
+                                 str(table) if table is not None else "*")
 
         return base
 

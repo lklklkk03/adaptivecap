@@ -83,6 +83,42 @@ class YellowSentinel:
 VERDICT_PATTERN = re.compile(r"\b(GREEN|YELLOW|RED)\b", re.IGNORECASE)
 
 
+# ---------------------------------------------------------------------------
+# Process-global verdict cache
+# ---------------------------------------------------------------------------
+# The cache is keyed by the full audit prompt. Identical prompts (same sink
+# call, same lineage summary, same user intent) get the same verdict, so
+# caching removes duplicate API calls when several experiment modules replay
+# the same audit question in one run.
+#
+# ``ELASTICCAP_LLM_CACHE=0`` disables the cache (every prompt is sent to the
+# API again). Latency measurements against the live API MUST run with the
+# cache disabled, otherwise repeated prompts measure a dict lookup instead
+# of the network round trip.
+_LLM_CACHE_ENABLED = os.environ.get("ELASTICCAP_LLM_CACHE", "1").strip() != "0"
+
+_LLM_CACHE: dict = {}
+_CACHE_STATS = {"hits": 0, "misses": 0, "api_calls": 0, "api_errors": 0,
+                "api_unparsed": 0}
+
+
+def llm_cache_enabled() -> bool:
+    """Whether the process-global verdict cache is active."""
+    return _LLM_CACHE_ENABLED
+
+
+def llm_cache_stats() -> dict:
+    """Snapshot of the cache counters (hits / misses / api_calls / errors)."""
+    return dict(_CACHE_STATS)
+
+
+def reset_llm_cache() -> None:
+    """Clear the verdict cache and its counters (used between experiments)."""
+    _LLM_CACHE.clear()
+    for k in _CACHE_STATS:
+        _CACHE_STATS[k] = 0
+
+
 def _coerce_verdict(raw: Optional[str]) -> Union[str, YellowSentinel]:
     """Coerce a raw model completion into a strict verdict."""
     if not raw:
@@ -224,39 +260,57 @@ def make_llm_classifier(
         api_key=api_key, base_url=base_url, timeout=timeout
     )
 
-    # Process-local verdict cache keyed by prompt substring. Same prompt ->
-    # same verdict, so we avoid duplicate DeepSeek calls during ablations
-    # that replay the same sink call many times. Caching also makes the
-    # experiment suite reproducible given a fixed prompt encoder.
-    _cache: dict = {}
-
     def classify(prompt: str) -> Union[str, YellowSentinel]:
-        cached = _cache.get(prompt)
-        if cached is not None:
-            return cached
-        try:
-            resp = client.chat.completions.create(
-                model=model,
-                temperature=temperature,
-                max_tokens=max_tokens,
-                messages=[
-                    {"role": "system", "content": instruction},
-                    {"role": "user", "content": prompt},
-                ],
-            )
-            raw = resp.choices[0].message.content if resp.choices else None
-            verdict = _coerce_verdict(raw)
-        except Exception:
-            verdict = YellowSentinel()
-        _cache[prompt] = verdict
+        if _LLM_CACHE_ENABLED:
+            cached = _LLM_CACHE.get(prompt)
+            if cached is not None:
+                _CACHE_STATS["hits"] += 1
+                return cached
+        _CACHE_STATS["misses"] += 1
+        verdict = YellowSentinel()
+        for attempt in range(3):
+            try:
+                resp = client.chat.completions.create(
+                    model=model,
+                    temperature=temperature,
+                    max_tokens=max_tokens,
+                    messages=[
+                        {"role": "system", "content": instruction},
+                        {"role": "user", "content": prompt},
+                    ],
+                )
+                _CACHE_STATS["api_calls"] += 1
+                raw = resp.choices[0].message.content if resp.choices else None
+                verdict = _coerce_verdict(raw)
+                if not isinstance(verdict, YellowSentinel):
+                    break
+                # Empty or unparseable completion: retry rather than letting a
+                # transient provider hiccup silently become a YELLOW
+                # escalation, which would enter the metrics as a real verdict.
+                _CACHE_STATS["api_unparsed"] += 1
+            except Exception:
+                _CACHE_STATS["api_errors"] += 1
+                verdict = YellowSentinel()
+            if attempt < 2:
+                import time as _time
+                _time.sleep(2.0 * (attempt + 1))
+        # Only cache real verdicts: caching a transient failure would make
+        # the run non-reproducible and silently degrade audit to YELLOW.
+        if _LLM_CACHE_ENABLED and not isinstance(verdict, YellowSentinel):
+            _LLM_CACHE[prompt] = verdict
         return verdict
 
     classify.is_available = True  # type: ignore[attr-defined]
     classify.model = model  # type: ignore[attr-defined]
+    classify.cache_enabled = _LLM_CACHE_ENABLED  # type: ignore[attr-defined]
+    classify.cache_stats = llm_cache_stats  # type: ignore[attr-defined]
     return classify
 
 
 __all__ = [
     "YellowSentinel",
     "make_llm_classifier",
+    "llm_cache_enabled",
+    "llm_cache_stats",
+    "reset_llm_cache",
 ]

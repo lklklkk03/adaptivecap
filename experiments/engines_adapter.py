@@ -216,14 +216,17 @@ class _GlobalContextDAG(ElasticDAG):
         super().__init__(signing_key=signing_key)
         self._global_context_budget: Budget = Budget.top()
 
-    def add_source(self, label, init_budget, tool_name=None):
-        node_id = super().add_source(label, init_budget, tool_name)
+    def add_source(self, label, init_budget, tool_name=None, tool_args=None):
+        node_id = super().add_source(label, init_budget, tool_name,
+                                     tool_args=tool_args)
         # Globally tighten the single context budget (ChainCaps behaviour).
         self._global_context_budget = self._global_context_budget.meet(init_budget)
         return node_id
 
-    def add_transform(self, label, input_node_ids, tool_name, pass_through=None):
-        node_id = super().add_transform(label, input_node_ids, tool_name, pass_through)
+    def add_transform(self, label, input_node_ids, tool_name, pass_through=None,
+                      tool_args=None):
+        node_id = super().add_transform(label, input_node_ids, tool_name,
+                                        pass_through, tool_args=tool_args)
         node = self.nodes[node_id]
         self._global_context_budget = self._global_context_budget.meet(node.budget)
         return node_id
@@ -299,6 +302,8 @@ class ReplayOutcome:
     component_trajectory: List[Dict] = field(default_factory=list)
     audit_verdicts: List[Dict] = field(default_factory=list)
     latency_ms_total: float = 0.0
+    # Per-call accounting (Table 3 / supplementary per-call table).
+    steps: List[Dict] = field(default_factory=list)
 
     def to_dict(self) -> Dict:
         return {
@@ -313,6 +318,7 @@ class ReplayOutcome:
             "block_reasons": self.block_reasons,
             "latency_ms_total": self.latency_ms_total,
             "audit_verdicts": self.audit_verdicts,
+            "steps": self.steps,
         }
 
 
@@ -343,6 +349,40 @@ def _replay_one(engine,
 
         outcome.outcomes.append(result.allowed)
         outcome.block_reasons.append(result.block_reason if not result.allowed else None)
+
+        # Per-call accounting record (used to rebuild the call-level table
+        # without re-deriving anything from the aggregate numbers).
+        sink_event = getattr(result, "sink_event", None)
+        audit_result = getattr(result, "audit_result", None)
+        step_rec = {
+            "step": step_idx,
+            "tool": tool_name,
+            "is_sink": sink_event is not None,
+            "budget_authorized": (
+                bool(sink_event.authorized) if sink_event is not None else None),
+            "allowed": bool(result.allowed),
+            "block_reason": result.block_reason,
+            "audit_verdict": (audit_result.verdict if audit_result else None),
+            "audit_reason": (audit_result.reason if audit_result else None),
+            "audit_decided_by": (getattr(audit_result, "decided_by", None)
+                                 if audit_result else None),
+            "audit_l1_aggregated": (getattr(audit_result, "l1_aggregated", None)
+                                    if audit_result else None),
+            "audit_l1_disclosure_hit": (
+                getattr(audit_result, "l1_disclosure_hit", None)
+                if audit_result else None),
+            "audit_l1_target_whitelisted": (
+                getattr(audit_result, "l1_target_whitelisted", None)
+                if audit_result else None),
+            "audit_l1_target_match": (
+                getattr(audit_result, "l1_target_match", None)
+                if audit_result else None),
+            "audit_l1_sensitive_hit": (
+                getattr(audit_result, "l1_sensitive_hit", None)
+                if audit_result else None),
+        }
+        outcome.steps.append(step_rec)
+
         if result.allowed:
             all_node_ids.append(result.output_node_id)
         else:
@@ -374,6 +414,8 @@ def _replay_one(engine,
                 "tool": tool_name,
                 "verdict": result.audit_result.verdict,
                 "reason": result.audit_result.reason,
+                "decided_by": getattr(result.audit_result, "decided_by", None),
+                "llm_raw_verdict": getattr(result.audit_result, "llm_raw_verdict", None),
             })
 
     outcome.latency_ms_total = (time.perf_counter() - t0) * 1000.0

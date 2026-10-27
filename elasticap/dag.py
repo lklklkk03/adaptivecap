@@ -31,6 +31,10 @@ class DataNode:
     tool_name: Optional[str] = None
     timestamp: float = field(default_factory=time.time)
     is_source: bool = False
+    # Raw tool-call arguments (used by the Layer-1 disclosure check, which
+    # needs the aggregation parameters — group key, group size — rather
+    # than just the tool name).
+    tool_args: Dict = field(default_factory=dict)
 
     @property
     def source_ancestors(self) -> Set[str]:
@@ -186,7 +190,8 @@ class ElasticDAG:
     # ═══════════════════════════════════════════════════════════════
 
     def add_source(self, label: str, init_budget: Budget,
-                   tool_name: Optional[str] = None) -> str:
+                   tool_name: Optional[str] = None,
+                   tool_args: Optional[Dict] = None) -> str:
         """Add a source data node.
 
         ELASTICCAP CHANGE: Each new source starts its own component
@@ -199,6 +204,7 @@ class ElasticDAG:
             budget=init_budget,
             tool_name=tool_name,
             is_source=True,
+            tool_args=dict(tool_args or {}),
         )
         self.nodes[node_id] = node
 
@@ -212,7 +218,8 @@ class ElasticDAG:
 
     def add_transform(self, label: str, input_node_ids: List[str],
                       tool_name: str,
-                      pass_through: Optional[Budget] = None) -> str:
+                      pass_through: Optional[Budget] = None,
+                      tool_args: Optional[Dict] = None) -> str:
         """Add a transform node. Budget = meet(parents) ∩ Pass(t).
 
         ELASTICCAP CHANGE: Assigns the node to the merged component
@@ -242,6 +249,7 @@ class ElasticDAG:
             budget=meet_budget,
             source_ids=list(input_node_ids),
             tool_name=tool_name,
+            tool_args=dict(tool_args or {}),
         )
         self.nodes[node_id] = node
 

@@ -137,6 +137,69 @@ def load_baseline() -> Dict:
         return json.load(fh)
 
 
+def bootstrap_ci(results: List["ScenarioResult"],
+                 n_resamples: int = 1000,
+                 seed: int = 42,
+                 alpha: float = 0.05) -> Dict[str, List[float]]:
+    """Scenario-level bootstrap 95% CI for BCR, ABR and the FP step count.
+
+    Resamples *scenarios* with replacement (the scenario is the unit of
+    analysis), recomputes each metric on the resample and reports the
+    percentile interval. This is the uncertainty statement used in place of
+    the withdrawn multi-seed variance: the LLM pipeline is deterministic
+    given a fixed verdict cache/temperature, so repeated runs would not
+    produce variance — the uncertainty is over the scenario sample.
+    """
+    import random as _random
+
+    benign = [r for r in results if r.task_type == "benign"]
+    attacks = [r for r in results if r.task_type == "adversarial"]
+    rng = _random.Random(seed)
+
+    def _pct(samples: List[float], q: float) -> float:
+        s = sorted(samples)
+        if not s:
+            return 0.0
+        idx = min(len(s) - 1, max(0, int(round(q * (len(s) - 1)))))
+        return s[idx]
+
+    bcr, abr, fp = [], [], []
+    for _ in range(n_resamples):
+        rb = [benign[rng.randrange(len(benign))] for _ in range(len(benign))] if benign else []
+        ra = [attacks[rng.randrange(len(attacks))] for _ in range(len(attacks))] if attacks else []
+        bcr.append(sum(1 for r in rb if r.benign_completed) / max(len(rb), 1))
+        abr.append(sum(1 for r in ra if r.attack_blocked) / max(len(ra), 1))
+        fp.append(sum(r.fp for r in rb))
+
+    return {
+        "bcr": [sum(1 for r in benign if r.benign_completed) / max(len(benign), 1),
+                _pct(bcr, alpha / 2), _pct(bcr, 1 - alpha / 2)],
+        "abr": [sum(1 for r in attacks if r.attack_blocked) / max(len(attacks), 1),
+                _pct(abr, alpha / 2), _pct(abr, 1 - alpha / 2)],
+        "fp_steps": [sum(r.fp for r in benign),
+                     _pct(fp, alpha / 2), _pct(fp, 1 - alpha / 2)],
+        "n_benign": len(benign),
+        "n_adversarial": len(attacks),
+        "n_resamples": n_resamples,
+        "seed": seed,
+    }
+
+
+def mcnemar_exact(a_correct: List[bool], b_correct: List[bool]) -> Dict:
+    """Exact McNemar test on paired per-scenario correctness vectors."""
+    from math import comb
+    n01 = sum(1 for a, b in zip(a_correct, b_correct) if a and not b)
+    n10 = sum(1 for a, b in zip(a_correct, b_correct) if not a and b)
+    n = n01 + n10
+    if n == 0:
+        p = 1.0
+    else:
+        tail = sum(comb(n, k) for k in range(0, min(n01, n10) + 1))
+        p = min(1.0, 2 * tail / (2 ** n))
+    return {"n_a_only": n01, "n_b_only": n10, "n_discordant": n,
+            "p_value": p}
+
+
 def markdown_table(headers: List[str], rows: List[List]) -> str:
     """Render a simple Markdown table from headers + rows."""
     out = ["| " + " | ".join(headers) + " |",
@@ -153,5 +216,7 @@ __all__ = [
     "write_report",
     "load_baseline",
     "markdown_table",
+    "bootstrap_ci",
+    "mcnemar_exact",
     "REPORTS_DIR",
 ]
