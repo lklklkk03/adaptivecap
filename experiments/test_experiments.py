@@ -72,10 +72,10 @@ def test_attacks_still_blocked():
 
 def test_auditor_layer1_red_on_ss_content():
     """Layer-1 regex must RED-flag payloads with SSN-like patterns."""
-    from elasticap.auditor import DeclassificationAuditor
-    from elasticap.dag import DataNode
-    from elasticap.budget import budget_display_only
-    from elasticap.engine import ToolCall
+    from adaptivecap.auditor import DeclassificationAuditor
+    from adaptivecap.dag import DataNode
+    from adaptivecap.budget import budget_display_only
+    from adaptivecap.engine import ToolCall
     aud = DeclassificationAuditor(signing_key=b"k" * 32, llm_classifier=None)
     src = DataNode(node_id="src", label="read_file(salary)",
                    budget=budget_display_only(),
@@ -91,10 +91,10 @@ def test_auditor_layer1_red_on_ss_content():
 def test_auditor_yellow_when_unavailable():
     """When no LLM is configured AND Layer1 cannot decide, the auditor must NOT
     auto-declassify (default YELLOW)."""
-    from elasticap.auditor import DeclassificationAuditor
-    from elasticap.dag import DataNode
-    from elasticap.budget import budget_display_only
-    from elasticap.engine import ToolCall
+    from adaptivecap.auditor import DeclassificationAuditor
+    from adaptivecap.dag import DataNode
+    from adaptivecap.budget import budget_display_only
+    from adaptivecap.engine import ToolCall
     aud = DeclassificationAuditor(signing_key=b"k" * 32, llm_classifier=None)
     src = DataNode(node_id="src", label="read_file(secret.env)",
                    budget=budget_display_only(),
@@ -126,7 +126,7 @@ def test_no_recovery_ablation_blocks_a1_email_step():
 def test_cross_package_sinktype_mapping_complete():
     """All SinkType members in elasticap must have a chaincaps counterpart
     and vice versa. Missing entries cause silent Budget(EMPTY) degradation."""
-    from elasticap.budget import SinkType as ECST
+    from adaptivecap.budget import SinkType as ECST
     from chaincaps.core.budget import SinkType as CCST
 
     ec_names = {m.name for m in ECST}
@@ -152,7 +152,7 @@ def test_manifest_backfill_covers_mcp_tools():
     """The 30 ChainCaps STANDARD_MANIFESTS must all be backfilled into
     elasticap manifests so that real MCP tool names (filesystem_read,
     slack_post_message, etc.) are correctly classified."""
-    from elasticap.manifest import get_manifest
+    from adaptivecap.manifest import get_manifest
 
     critical_tools = [
         "filesystem_read", "filesystem_write", "slack_post_message",

@@ -28,8 +28,8 @@ from .engines_adapter import (
     run_elasticap, run_chaincaps, _NoScopeElasticCapEngine,
     _translate_source_budgets, ReplayOutcome,
 )
-from elasticap.engine import ElasticCapEngine, ToolCall
-from elasticap.auditor import DeclassificationAuditor
+from adaptivecap.engine import ElasticCapEngine, ToolCall
+from adaptivecap.auditor import DeclassificationAuditor
 
 from .scenarios import (
     load_raid_v3_group4_fps, build_scope_crossing_scenarios,
@@ -85,7 +85,7 @@ def _run_no_scope(scenarios, auditor):
         )
         engine.set_user_intent(s.user_intent)
         from experiments.engines_adapter import _replay_one, SHARED_MANIFESTS
-        from elasticap.engine import ToolCall as ECToolCall
+        from adaptivecap.engine import ToolCall as ECToolCall
         def factory(name, args, deps):
             return ECToolCall(tool_name=name, arguments=args, data_dependencies=deps)
         o = _replay_one(engine, s, factory, "NoScope", lambda: engine.get_report(), capture_trajectory=False)
@@ -114,8 +114,8 @@ class _NoLayer1Auditor(DeclassificationAuditor):
         # Skip Layer 1 entirely — Layer 2 still sees the same audit prompt
         # but no deterministic pre-decision is made.
         if self._llm:
-            from elasticap.auditor import AuditResult
-            from elasticap.token_issuer import issue_declassification_token
+            from adaptivecap.auditor import AuditResult
+            from adaptivecap.token_issuer import issue_declassification_token
             prompt = self._build_audit_prompt(sink_call, dependency_chain, user_intent)
             try:
                 llm_verdict = self._llm(prompt)

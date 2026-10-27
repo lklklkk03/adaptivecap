@@ -26,8 +26,8 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Callable, Dict, List, Optional, Tuple
 
-from elasticap.auditor import DeclassificationAuditor
-from elasticap.llm_client import YellowSentinel, make_llm_classifier
+from adaptivecap.auditor import DeclassificationAuditor
+from adaptivecap.llm_client import YellowSentinel, make_llm_classifier
 
 
 # ---------------------------------------------------------------------------

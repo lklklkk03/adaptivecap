@@ -50,7 +50,7 @@ from experiments.scenarios import (
     load_raid_v3_group1, load_realistic_workflows,
 )
 from experiments.llm_auditor import build_auditor, reset_audit_log
-from elasticap.llm_client import llm_cache_enabled, llm_cache_stats
+from adaptivecap.llm_client import llm_cache_enabled, llm_cache_stats
 
 
 # Order-robustness sweep (previously labelled "multi-seed"). The LLM

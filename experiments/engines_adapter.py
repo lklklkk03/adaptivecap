@@ -32,13 +32,13 @@ import time
 from dataclasses import dataclass, field
 from typing import Any, Callable, Dict, List, Optional, Tuple
 
-from elasticap.budget import Budget, SinkPrivilege, SinkType
-from elasticap.engine import (
+from adaptivecap.budget import Budget, SinkPrivilege, SinkType
+from adaptivecap.engine import (
     ElasticCapEngine, ToolCall as ECToolCall, ToolResult as ECToolResult,
 )
-from elasticap.manifest import ToolManifest
-from elasticap.auditor import DeclassificationAuditor
-from elasticap.dag import ElasticDAG
+from adaptivecap.manifest import ToolManifest
+from adaptivecap.auditor import DeclassificationAuditor
+from adaptivecap.dag import ElasticDAG
 
 from .scenarios import (
     ElasticScenario,

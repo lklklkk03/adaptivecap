@@ -25,13 +25,13 @@ from dataclasses import dataclass, field
 from typing import Any, Dict, List, Optional, Tuple
 
 # ── ElasticCap imports ──────────────────────────────────────────
-from elasticap.budget import (
+from adaptivecap.budget import (
     Budget, SinkPrivilege, SinkType,
     budget_display_only, budget_public, budget_internal_email,
 )
-from elasticap.engine import ElasticCapEngine, ToolCall, ToolResult
-from elasticap.auditor import DeclassificationAuditor
-from elasticap.manifest import ToolManifest
+from adaptivecap.engine import ElasticCapEngine, ToolCall, ToolResult
+from adaptivecap.auditor import DeclassificationAuditor
+from adaptivecap.manifest import ToolManifest
 
 # ── ChainCaps imports ──────────────────────────────────────────
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '..', 'src', 'chaincaps-code'))

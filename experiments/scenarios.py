@@ -37,11 +37,11 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Dict, List, Optional, Tuple
 
-from elasticap.budget import (
+from adaptivecap.budget import (
     Budget, SinkPrivilege, SinkType,
     budget_display_only, budget_public,
 )
-from elasticap.engine import ToolCall
+from adaptivecap.engine import ToolCall
 
 
 # ---------------------------------------------------------------------------

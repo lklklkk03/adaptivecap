@@ -5,7 +5,7 @@ for Secure and Flexible LLM Agent Workflows"** (Electronics, 2026).
 
 ## Repository layout
 
-- `elasticap/` — the AdaptiveCap enforcement pipeline: dependency-chain scope isolation,
+- `adaptivecap/` — the AdaptiveCap enforcement pipeline: dependency-chain scope isolation,
   the dual-layer declassification auditor (deterministic Layer-1 gates + LLM Layer-2),
   and automatic privilege recovery.
 - `experiments/` — the experiment scripts that produce every table and figure in the paper

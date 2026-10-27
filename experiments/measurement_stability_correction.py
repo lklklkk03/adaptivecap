@@ -28,7 +28,7 @@ from .scenarios import (
     load_raid_v3_group4_fps, build_scope_crossing_scenarios, load_raid_v3_group1,
 )
 from .llm_auditor import build_auditor  # noqa: F401  (constructs the audit log)
-from elasticap.llm_client import make_llm_classifier, YellowSentinel
+from adaptivecap.llm_client import make_llm_classifier, YellowSentinel
 
 # Scenario ids whose audit decisions were affected (identified from the
 # archived audit-log snapshot by raw_verdict == "YellowSentinel").
@@ -64,7 +64,7 @@ def main(prefer_deepseek: bool = True) -> Dict:
         raw_log.append("YellowSentinel" if isinstance(v, YellowSentinel) else str(v))
         return v
 
-    from elasticap.auditor import DeclassificationAuditor
+    from adaptivecap.auditor import DeclassificationAuditor
     aud = DeclassificationAuditor(signing_key=b"exp1c-32-byte-hmac-signing-key",
                                  llm_classifier=recording)
 

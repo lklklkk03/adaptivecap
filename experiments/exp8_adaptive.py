@@ -35,10 +35,10 @@ from typing import Dict, List, Optional
 from .reports import write_report, markdown_table
 from .engines_adapter import run_elasticap, run_chaincaps, ReplayOutcome, SHARED_MANIFESTS
 from .llm_auditor import build_auditor, reset_audit_log
-from elasticap.budget import (
+from adaptivecap.budget import (
     Budget, SinkPrivilege, SinkType, budget_display_only, budget_internal_email,
 )
-from elasticap.manifest import ToolManifest
+from adaptivecap.manifest import ToolManifest
 
 
 PUBLIC_URL = "https://public.example.com/index.html"

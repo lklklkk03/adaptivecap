@@ -35,11 +35,11 @@ from .scenarios import (
 )
 from .llm_auditor import build_auditor, reset_audit_log
 
-from elasticap.budget import (
+from adaptivecap.budget import (
     budget_display_only, budget_public,
     Budget, SinkPrivilege, SinkType,
 )
-from elasticap.manifest import ToolManifest
+from adaptivecap.manifest import ToolManifest
 
 
 # Sources whose ChainCaps-Gold manifest grants a public-scope budget

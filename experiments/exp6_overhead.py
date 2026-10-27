@@ -43,12 +43,12 @@ from .scenarios import (
 from .engines_adapter import SHARED_MANIFESTS
 from .llm_auditor import reset_audit_log
 
-from elasticap.budget import Budget, SinkPrivilege, SinkType, budget_display_only
-from elasticap.dag import ElasticDAG
-from elasticap.auditor import DeclassificationAuditor
-from elasticap.token_issuer import issue_declassification_token
-from elasticap.engine import ToolCall, ElasticCapEngine
-from elasticap.llm_client import (
+from adaptivecap.budget import Budget, SinkPrivilege, SinkType, budget_display_only
+from adaptivecap.dag import ElasticDAG
+from adaptivecap.auditor import DeclassificationAuditor
+from adaptivecap.token_issuer import issue_declassification_token
+from adaptivecap.engine import ToolCall, ElasticCapEngine
+from adaptivecap.llm_client import (
     make_llm_classifier, llm_cache_enabled, llm_cache_stats, reset_llm_cache,
     YellowSentinel,
 )
@@ -115,7 +115,7 @@ def bench_scope_bucket() -> Dict:
 
 def bench_layer1() -> Dict:
     aud = DeclassificationAuditor(signing_key=b"k" * 32, llm_classifier=None)
-    from elasticap.dag import DataNode
+    from adaptivecap.dag import DataNode
     node = DataNode(node_id="src", label="read_file(secret.env)",
                     budget=budget_display_only(), tool_name="read_file",
                     is_source=True, tool_args={"path": "secret.env"})
@@ -200,7 +200,7 @@ def bench_llm_path(n_samples: int = N_LLM_SAMPLES) -> Dict:
     os.environ["ELASTICCAP_LLM_CACHE"] = "0"
     # Re-import time flag: the module-level flag was read at import, so read
     # it fresh here by reloading just the flag through the helper.
-    import elasticap.llm_client as _llmc
+    import adaptivecap.llm_client as _llmc
     _llmc._LLM_CACHE_ENABLED = False
     reset_llm_cache()
 

@@ -35,8 +35,8 @@ from .exp1_baseline import _to_result
 from .scenarios import load_realistic_workflows
 from .llm_auditor import build_auditor, reset_audit_log
 
-from elasticap.budget import Budget, SinkPrivilege, SinkType
-from elasticap.engine import ToolCall, ElasticCapEngine
+from adaptivecap.budget import Budget, SinkPrivilege, SinkType
+from adaptivecap.engine import ToolCall, ElasticCapEngine
 
 
 # Tool arguments that name a network target but are not in the engines'

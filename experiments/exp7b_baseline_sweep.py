@@ -57,7 +57,7 @@ from experiments.scenarios import (
 )
 from experiments.llm_auditor import build_auditor, reset_audit_log
 
-from elasticap.budget import Budget, SinkPrivilege, SinkType
+from adaptivecap.budget import Budget, SinkPrivilege, SinkType
 
 
 # ---------------------------------------------------------------------------

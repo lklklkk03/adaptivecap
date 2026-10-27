@@ -40,7 +40,7 @@ from .scenarios import (
     load_raid_v3_group1,
 )
 from .llm_auditor import build_auditor, reset_audit_log
-from elasticap.llm_client import (
+from adaptivecap.llm_client import (
     llm_cache_enabled, llm_cache_stats, reset_llm_cache,
 )
 
