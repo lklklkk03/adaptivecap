@@ -15,8 +15,8 @@ for Secure and Flexible LLM Agent Workflows"** (Electronics, 2026).
   (classifier, verdict-cache state, patch flags, machine specification).
 - `supplementary/Supplementary_Material.pdf` — the supplementary material document
   (Tables S1–S7 and the verbatim Layer-2 audit prompt, Section S7).
-- `Table_S1_per_scenario.csv` — per-scenario results for all 151 scenarios (Table S1).
-- `Table_S2_per_call.csv` — per-call decision log, one row per tool call (Table S2).
+- `supplementary/Table_S1_per_scenario.csv` — per-scenario results for all 151 scenarios (Table S1).
+- `supplementary/Table_S2_per_call.csv` — per-call decision log, one row per tool call (Table S2).
 
 Every aggregate reported in the paper is recomputable from the two CSV files.
 
