@@ -1,0 +1,41 @@
+{
+  "rows": [
+    {
+      "name": "Scope bucket (component + ctx budget)",
+      "n": 2000,
+      "median_ms": 0.012936536222696304,
+      "p95_ms": 0.013128039427101612,
+      "mean_ms": 0.013064532657153904
+    },
+    {
+      "name": "Layer-1 audit (regex + aggregate + target)",
+      "n": 2000,
+      "median_ms": 0.009744486305862665,
+      "p95_ms": 0.010224990546703339,
+      "mean_ms": 0.009793561126571149
+    },
+    {
+      "name": "Token issuance (HMAC-SHA256)",
+      "n": 2000,
+      "median_ms": 0.015321536920964718,
+      "p95_ms": 0.018256017938256264,
+      "mean_ms": 0.01584594207815826
+    },
+    {
+      "name": "LLM (Layer 2)",
+      "n": 3,
+      "median_ms": 0.11977599933743477,
+      "p95_ms": 6162.532406975515,
+      "mean_ms": 2054.2508906607204,
+      "model": "deepseek-v4-pro",
+      "classifier_type": "deepseek"
+    },
+    {
+      "name": "Integrated ElasticCap (full scenario)",
+      "n_calls": 6,
+      "total_ms": 0.48251100815832615,
+      "per_call_ms": 0.08041850135972102,
+      "auditor_invoked": 0
+    }
+  ]
+}

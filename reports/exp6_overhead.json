@@ -1,0 +1,159 @@
+{
+ "machine": {
+  "cpu": "Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz",
+  "n_cpu": 80,
+  "mem_gb": 125.5,
+  "os": "Linux-6.8.0-41-generic-x86_64-with-glibc2.39",
+  "python": "3.13.5"
+ },
+ "hot_path": {
+  "scope_bucket": {
+   "name": "Scope bucket (component + context budget)",
+   "n": 2000,
+   "min_ms": 0.015565892681479454,
+   "p50_ms": 0.021911924704909325,
+   "p95_ms": 0.03891694359481335,
+   "p99_ms": 0.04377798177301884,
+   "max_ms": 0.05400995723903179,
+   "mean_ms": 0.023438094183802605
+  },
+  "layer1": {
+   "name": "Layer-1 audit (pattern + k-anonymity + target)",
+   "n": 2000,
+   "min_ms": 0.00974978320300579,
+   "p50_ms": 0.010712072253227234,
+   "p95_ms": 0.03926502540707588,
+   "p99_ms": 0.04535890184342861,
+   "max_ms": 140.77218086458743,
+   "mean_ms": 0.08480806066654623
+  },
+  "token": {
+   "name": "Token issuance (HMAC-SHA256)",
+   "n": 2000,
+   "min_ms": 0.012406846508383751,
+   "p50_ms": 0.013412907719612122,
+   "p95_ms": 0.014189863577485085,
+   "p99_ms": 0.02398993819952011,
+   "max_ms": 0.029935967177152634,
+   "mean_ms": 0.013573761680163443
+  },
+  "integrated": {
+   "name": "Integrated AdaptiveCap per call (Layer-2 disabled)",
+   "n": 800,
+   "min_ms": 0.02622429747134447,
+   "p50_ms": 0.02759526250883937,
+   "p95_ms": 0.032322772312909365,
+   "p99_ms": 0.08988298941403627,
+   "max_ms": 0.15684496611356735,
+   "mean_ms": 0.02964107465231791
+  }
+ },
+ "llm_path": {
+  "name": "Layer-2 LLM (live API, cache disabled)",
+  "n": 30,
+  "min_ms": 1380.2718839142472,
+  "p50_ms": 2004.6688748989254,
+  "p95_ms": 3073.8416600506753,
+  "p99_ms": 4144.963191822171,
+  "max_ms": 4144.963191822171,
+  "mean_ms": 2131.845364587692,
+  "verdicts": {
+   "GREEN": 30
+  },
+  "cache_enabled_during_measurement": false
+ },
+ "chaincaps": {
+  "integrated": {
+   "name": "Integrated ChainCaps per call (same machine)",
+   "n": 800,
+   "min_ms": 0.014822755474597216,
+   "p50_ms": 0.016012752894312143,
+   "p95_ms": 0.01732999226078391,
+   "p99_ms": 0.019309751223772764,
+   "max_ms": 0.02021301770582795,
+   "mean_ms": 0.016036773158703
+  },
+  "dag_sweep": [
+   {
+    "name": "ChainCaps DAG size 10",
+    "n": 100,
+    "min_ms": 0.011001946404576302,
+    "p50_ms": 0.011597061529755592,
+    "p95_ms": 0.012965872883796692,
+    "p99_ms": 0.017180107533931732,
+    "max_ms": 0.027713831514120102,
+    "mean_ms": 0.011895704083144665,
+    "dag_size": 10
+   },
+   {
+    "name": "ChainCaps DAG size 50",
+    "n": 100,
+    "min_ms": 0.010679010301828384,
+    "p50_ms": 0.01154514029622078,
+    "p95_ms": 0.018300022929906845,
+    "p99_ms": 0.02727680839598179,
+    "max_ms": 0.02735992893576622,
+    "mean_ms": 0.012287693098187447,
+    "dag_size": 50
+   },
+   {
+    "name": "ChainCaps DAG size 100",
+    "n": 100,
+    "min_ms": 0.011100899428129196,
+    "p50_ms": 0.011639902368187904,
+    "p95_ms": 0.012460164725780487,
+    "p99_ms": 0.023648841306567192,
+    "max_ms": 0.027955975383520126,
+    "mean_ms": 0.012029390782117844,
+    "dag_size": 100
+   },
+   {
+    "name": "ChainCaps DAG size 500",
+    "n": 100,
+    "min_ms": 0.011001946404576302,
+    "p50_ms": 0.011347932741045952,
+    "p95_ms": 0.015003839507699013,
+    "p99_ms": 0.027355970814824104,
+    "max_ms": 0.027771107852458954,
+    "mean_ms": 0.01206669257953763,
+    "dag_size": 500
+   },
+   {
+    "name": "ChainCaps DAG size 1000",
+    "n": 100,
+    "min_ms": 0.010972842574119568,
+    "p50_ms": 0.011284137144684792,
+    "p95_ms": 0.011890893802046776,
+    "p99_ms": 0.016127945855259895,
+    "max_ms": 0.01633819192647934,
+    "mean_ms": 0.0114654959179461,
+    "dag_size": 1000
+   }
+  ]
+ },
+ "trigger_rate": {
+  "total_tool_calls": 566,
+  "sink_attempts": 190,
+  "audited_sink_requests": 114,
+  "trigger_rate_per_call": 0.20141342756183744,
+  "trigger_rate_per_sink": 0.6,
+  "source": "exp1_baseline.json call_summary"
+ },
+ "amortized": {
+  "trigger_rate_per_call": 0.20141342756183744,
+  "llm_mean_ms": 2131.845364587692,
+  "expected_ms_per_call": 429.3822819134221,
+  "expected_ms_per_sink": 1279.1072187526154
+ },
+ "config": {
+  "llm_cache_enabled_at_measurement": false,
+  "llm_samples": 30,
+  "cache_stats_after": {
+   "hits": 0,
+   "misses": 30,
+   "api_calls": 30,
+   "api_errors": 0,
+   "api_unparsed": 0
+  }
+ }
+}

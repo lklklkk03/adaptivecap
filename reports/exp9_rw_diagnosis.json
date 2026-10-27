@@ -1,0 +1,232 @@
+{
+  "description": {
+    "n_scenarios": 50,
+    "n_attacks": 30,
+    "n_benign": 20,
+    "total_steps": 213,
+    "scenarios_with_declared_source_budgets": 45,
+    "distinct_tool_chains": 39,
+    "tool_chain_counts": {
+      "filesystem_read -> summarize_text -> format_data -> fetch_url": 1,
+      "postgres_query -> format_data -> summarize_text -> slack_post_message": 3,
+      "filesystem_read -> format_data -> summarize_text -> github_create_issue": 1,
+      "filesystem_read -> summarize_text -> format_data -> email_send": 5,
+      "filesystem_read -> summarize_text -> format_data -> browser_navigate": 1,
+      "filesystem_read -> summarize_text -> memory_store -> memory_retrieve -> fetch_url": 1,
+      "postgres_query -> format_data -> summarize_text -> email_send": 2,
+      "filesystem_read -> summarize_text -> format_data -> slack_post_message": 2,
+      "filesystem_read -> summarize_text -> format_data -> shell_exec": 1,
+      "filesystem_read -> translate_text -> format_data -> fetch_url": 1,
+      "filesystem_read -> summarize_text -> filesystem_write -> filesystem_read -> fetch_url": 1,
+      "postgres_query -> format_data -> memory_store -> memory_retrieve -> summarize_text -> email_send": 1,
+      "filesystem_read -> summarize_text -> shell_exec -> filesystem_read -> fetch_url": 1,
+      "fetch_url -> summarize_text -> format_data -> github_create_issue": 1,
+      "filesystem_read -> translate_text -> format_data -> filesystem_write -> slack_post_message": 1,
+      "postgres_query -> summarize_text -> format_data -> summarize_text -> email_send": 1,
+      "filesystem_read -> summarize_text -> format_data -> github_create_pr": 1,
+      "browser_navigate -> browser_screenshot -> summarize_text -> format_data -> email_send": 1,
+      "memory_retrieve -> summarize_text -> format_data -> fetch_url": 1,
+      "fetch_url -> filesystem_read -> summarize_text -> format_data -> slack_post_message": 1,
+      "postgres_query -> postgres_query -> summarize_text -> format_data -> email_send": 1,
+      "filesystem_read -> filesystem_read -> summarize_text -> format_data -> github_create_issue": 1,
+      "fetch_url -> filesystem_read -> summarize_text -> format_data -> email_send": 1,
+      "postgres_query -> format_data -> summarize_text -> fetch_url": 1,
+      "filesystem_read -> filesystem_read -> summarize_text -> format_data -> email_send": 1,
+      "filesystem_read -> filesystem_read -> summarize_text -> format_data -> slack_post_message": 1,
+      "fetch_url -> filesystem_read -> summarize_text -> format_data -> browser_navigate": 1,
+      "filesystem_read -> summarize_text -> format_data -> filesystem_write": 2,
+      "filesystem_read -> summarize_text -> display_to_user": 1,
+      "postgres_query -> format_data -> display_to_user": 1,
+      "fetch_url -> summarize_text -> format_data -> slack_post_message": 1,
+      "filesystem_read -> summarize_text -> format_data -> display_to_user": 2,
+      "fetch_url -> summarize_text -> format_data -> display_to_user": 2,
+      "filesystem_read -> summarize_text -> format_data -> github_create_issue": 1,
+      "postgres_query -> format_data -> summarize_text -> filesystem_write": 1,
+      "fetch_url -> translate_text -> summarize_text -> display_to_user": 1,
+      "fetch_url -> summarize_text -> format_data -> memory_store": 1,
+      "filesystem_read -> format_data -> summarize_text -> filesystem_write": 1,
+      "postgres_query -> summarize_text -> format_data -> display_to_user": 1
+    },
+    "source": "chaincaps.attacks.realistic_workflows (upstream ChainCaps repository; 30 attack + 20 benign)"
+  },
+  "annotation_availability": {
+    "scenarios_with_any_annotation": 0,
+    "scenarios_without_annotation": 50,
+    "annotated_steps": 0,
+    "total_steps": 213
+  },
+  "variants": [
+    {
+      "label": "as-is (no annotations)",
+      "ElasticCap": {
+        "abr": 1.0,
+        "bcr": 1.0,
+        "fp": 0,
+        "fn": 0,
+        "ci": {
+          "bcr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "abr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fp_steps": [
+            0,
+            0,
+            0
+          ],
+          "n_benign": 20,
+          "n_adversarial": 30,
+          "n_resamples": 1000,
+          "seed": 42
+        }
+      },
+      "ChainCaps": {
+        "abr": 1.0,
+        "bcr": 0.85,
+        "fp": 3,
+        "fn": 0,
+        "ci": {
+          "bcr": [
+            0.85,
+            0.7,
+            1.0
+          ],
+          "abr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fp_steps": [
+            3,
+            0,
+            6
+          ],
+          "n_benign": 20,
+          "n_adversarial": 30,
+          "n_resamples": 1000,
+          "seed": 42
+        }
+      },
+      "source": "exp7_baselines.json realistic_workflows"
+    },
+    {
+      "label": "deps-annotated",
+      "ElasticCap": {
+        "abr": 1.0,
+        "bcr": 1.0,
+        "fp": 0,
+        "fn": 0,
+        "ci": {
+          "bcr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "abr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fp_steps": [
+            0,
+            0,
+            0
+          ],
+          "n_benign": 20,
+          "n_adversarial": 30,
+          "n_resamples": 1000,
+          "seed": 42
+        }
+      },
+      "ChainCaps": {
+        "abr": 1.0,
+        "bcr": 0.85,
+        "fp": 3,
+        "fn": 0,
+        "ci": {
+          "bcr": [
+            0.85,
+            0.7,
+            1.0
+          ],
+          "abr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fp_steps": [
+            3,
+            0,
+            6
+          ],
+          "n_benign": 20,
+          "n_adversarial": 30,
+          "n_resamples": 1000,
+          "seed": 42
+        }
+      }
+    },
+    {
+      "label": "deps+sink-scopes",
+      "ElasticCap": {
+        "abr": 1.0,
+        "bcr": 1.0,
+        "fp": 0,
+        "fn": 0,
+        "ci": {
+          "bcr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "abr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fp_steps": [
+            0,
+            0,
+            0
+          ],
+          "n_benign": 20,
+          "n_adversarial": 30,
+          "n_resamples": 1000,
+          "seed": 42
+        }
+      },
+      "ChainCaps": {
+        "abr": 1.0,
+        "bcr": 0.85,
+        "fp": 3,
+        "fn": 0,
+        "ci": {
+          "bcr": [
+            0.85,
+            0.7,
+            1.0
+          ],
+          "abr": [
+            1.0,
+            1.0,
+            1.0
+          ],
+          "fp_steps": [
+            3,
+            0,
+            6
+          ],
+          "n_benign": 20,
+          "n_adversarial": 30,
+          "n_resamples": 1000,
+          "seed": 42
+        }
+      }
+    }
+  ]
+}

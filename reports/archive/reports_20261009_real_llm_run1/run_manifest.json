@@ -1,0 +1,41 @@
+{
+  "tag": "real_llm_run1",
+  "archived_at": "2026-10-09 13:16:36",
+  "reports_dir": "/mnt/sdb/lk/AgentAuth/demo/experiments/reports",
+  "git_rev": "8280be8+dirty",
+  "env": {
+    "ELASTICCAP_LLM": "auto",
+    "ELASTICCAP_LLM_CACHE": "1",
+    "ELASTICCAP_P3_HARDENING": "1",
+    "ELASTICCAP_MIN_GROUP_K": "5"
+  },
+  "machine": {
+    "cpu": "Intel(R) Xeon(R) Gold 6148 CPU @ 2.40GHz",
+    "n_cores": 80,
+    "mem_gb": 125.5,
+    "os": "Linux-6.8.0-41-generic-x86_64-with-glibc2.39",
+    "python": "3.13.5",
+    "container": "bare-metal"
+  },
+  "classifier": {
+    "classifier": "deepseek",
+    "model": "deepseek-v4-pro",
+    "config": {
+      "classifier_type": "deepseek",
+      "model": "deepseek-v4-pro",
+      "temperature": 0.0,
+      "llm_cache_enabled": true,
+      "llm_cache_stats": {
+        "hits": 0,
+        "misses": 117,
+        "api_calls": 117,
+        "api_errors": 0
+      },
+      "p3_hardening": true,
+      "min_group_k": 5,
+      "python": "3.13.5",
+      "platform": "Linux-6.8.0-41-generic-x86_64-with-glibc2.39",
+      "machine": "x86_64"
+    }
+  }
+}

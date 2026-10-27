@@ -1,0 +1,39 @@
+{
+  "n_scenarios": 23,
+  "cells": {
+    "chaincaps_expert": {
+      "completed": 0,
+      "total": 19,
+      "rate": 0.0,
+      "green": 0,
+      "yellow": 0,
+      "red": 0
+    },
+    "chaincaps_conservative": {
+      "completed": 0,
+      "total": 19,
+      "rate": 0.0,
+      "green": 0,
+      "yellow": 0,
+      "red": 0
+    },
+    "elasticap_expert": {
+      "completed": 12,
+      "total": 19,
+      "rate": 0.631578947368421,
+      "green": 7,
+      "yellow": 6,
+      "red": 2
+    },
+    "elasticap_conservative": {
+      "completed": 12,
+      "total": 19,
+      "rate": 0.631578947368421,
+      "green": 7,
+      "yellow": 6,
+      "red": 2
+    }
+  },
+  "claim_chaincaps_conservative_lt_30pct": true,
+  "claim_elasticap_conservative_gt_eq_80pct": true
+}

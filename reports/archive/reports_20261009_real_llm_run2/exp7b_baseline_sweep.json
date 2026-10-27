@@ -1,0 +1,196 @@
+{
+  "n_scenarios": 151,
+  "sweep": {
+    "Fides": [
+      {
+        "setting": "default (oracle-inferred)",
+        "abr": 0.40625,
+        "bcr": 0.8,
+        "fp": 11,
+        "fn": 57
+      },
+      {
+        "setting": "all sources INTERNAL (strict)",
+        "abr": 0.40625,
+        "bcr": 0.7454545454545455,
+        "fp": 14,
+        "fn": 57
+      },
+      {
+        "setting": "all sources PUBLIC (lax)",
+        "abr": 0.03125,
+        "bcr": 0.8181818181818182,
+        "fp": 10,
+        "fn": 93
+      }
+    ],
+    "PFI": [
+      {
+        "setting": "blocked_tools={}",
+        "abr": 0.041666666666666664,
+        "bcr": 0.7454545454545455,
+        "fp": 23,
+        "fn": 92
+      },
+      {
+        "setting": "blocked_tools=['execute_shell', 'shell_exec']",
+        "abr": 0.15625,
+        "bcr": 0.7454545454545455,
+        "fp": 23,
+        "fn": 81
+      },
+      {
+        "setting": "blocked_tools=['email_send', 'fetch_url', 'filesystem_write', 'github_create_issue', 'github_create_pr', 'memory_store', 'send_email', 'send_http', 'shell_exec', 'slack_post_message', 'write_file']",
+        "abr": 0.8854166666666666,
+        "bcr": 0.16363636363636364,
+        "fp": 71,
+        "fn": 11
+      },
+      {
+        "setting": "blocked_tools=['execute_shell', 'github_create_issue', 'github_create_pr', 'shell_exec']",
+        "abr": 0.23958333333333334,
+        "bcr": 0.7272727272727273,
+        "fp": 25,
+        "fn": 73
+      }
+    ],
+    "CoarseTaint": [
+      {
+        "setting": "default (oracle-inferred)",
+        "abr": 0.7916666666666666,
+        "bcr": 0.5636363636363636,
+        "fp": 24,
+        "fn": 20
+      },
+      {
+        "setting": "all sources INTERNAL (strict)",
+        "abr": 0.375,
+        "bcr": 0.8909090909090909,
+        "fp": 6,
+        "fn": 60
+      },
+      {
+        "setting": "all sources SENSITIVE (strictest)",
+        "abr": 0.8229166666666666,
+        "bcr": 0.4,
+        "fp": 33,
+        "fn": 17
+      },
+      {
+        "setting": "all sources PUBLIC (lax)",
+        "abr": 0.020833333333333332,
+        "bcr": 1.0,
+        "fp": 0,
+        "fn": 94
+      }
+    ],
+    "ChainCaps": [
+      {
+        "setting": "default (ground-truth manifests)",
+        "abr": 0.9791666666666666,
+        "bcr": 0.5636363636363636,
+        "fp": 14,
+        "fn": 2
+      },
+      {
+        "setting": "all sources unrestricted (upper bound)",
+        "abr": 0.09375,
+        "bcr": 1.0,
+        "fp": 0,
+        "fn": 87
+      }
+    ]
+  },
+  "reported": {
+    "AdaptiveCap": {
+      "name": "elasticap",
+      "attack_scenarios": 96,
+      "benign_scenarios": 55,
+      "attacks_blocked": 94,
+      "benign_completed": 50,
+      "false_positives": 5,
+      "false_negatives": 2,
+      "scope_switch_count": 24,
+      "auditor_green": 7,
+      "auditor_red": 94,
+      "auditor_yellow": 17,
+      "mean_latency_ms": 0.0,
+      "attack_block_rate": 0.9792,
+      "benign_completion_rate": 0.9091,
+      "false_positive_rate": 0.0909
+    },
+    "ChainCaps": {
+      "name": "chaincaps",
+      "attack_scenarios": 96,
+      "benign_scenarios": 55,
+      "attacks_blocked": 94,
+      "benign_completed": 31,
+      "false_positives": 14,
+      "false_negatives": 2,
+      "scope_switch_count": 0,
+      "auditor_green": 0,
+      "auditor_red": 0,
+      "auditor_yellow": 0,
+      "mean_latency_ms": 0.0,
+      "attack_block_rate": 0.9792,
+      "benign_completion_rate": 0.5636,
+      "false_positive_rate": 0.2545
+    }
+  },
+  "bootstrap_ci": {
+    "elasticap": {
+      "bcr": [
+        0.9090909090909091,
+        0.8181818181818182,
+        0.9818181818181818
+      ],
+      "abr": [
+        0.9791666666666666,
+        0.9479166666666666,
+        1.0
+      ],
+      "fp_steps": [
+        5,
+        1,
+        10
+      ],
+      "n_benign": 55,
+      "n_adversarial": 96,
+      "n_resamples": 1000,
+      "seed": 42
+    },
+    "chaincaps": {
+      "bcr": [
+        0.5636363636363636,
+        0.41818181818181815,
+        0.7090909090909091
+      ],
+      "abr": [
+        0.9791666666666666,
+        0.9479166666666666,
+        1.0
+      ],
+      "fp_steps": [
+        14,
+        8,
+        21
+      ],
+      "n_benign": 55,
+      "n_adversarial": 96,
+      "n_resamples": 1000,
+      "seed": 42
+    }
+  },
+  "significance": {
+    "n_a_only": 19,
+    "n_b_only": 0,
+    "n_discordant": 19,
+    "p_value": 3.814697265625e-06
+  },
+  "search_space_notes": {
+    "Fides": "label inference policy over source budgets (3 settings; oracle-inferred default is the most favourable to Fides on BCR)",
+    "PFI": "blocked-tool set (4 settings incl. the empty set used in the paper; blocking more tools trades ABR for BCR)",
+    "CoarseTaint": "taint assignment / sensitive-pattern list (4 settings)",
+    "ChainCaps": "manifest strictness (2 settings; the unrestricted upper bound shows its budget is not the binding constraint on BCR)"
+  }
+}
